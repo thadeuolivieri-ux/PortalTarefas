@@ -23,6 +23,17 @@ namespace PortalTarefas.Web.Controllers
             return View(tarefas);
         }
 
+        public async Task<IActionResult> Detalhes(int id)
+        {
+            var tarefa = await _service.ObterPorIdAsync(id);
+            if (tarefa == null)
+            {
+                return NotFound();
+            }
+
+            return View(tarefa);
+        }
+
         public IActionResult Criar()
         {
             return View(new TarefaInputModel());

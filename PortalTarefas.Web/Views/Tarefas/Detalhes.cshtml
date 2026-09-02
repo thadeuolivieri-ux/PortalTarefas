@@ -1,0 +1,28 @@
+@model PortalTarefas.Web.Models.Tarefa
+
+@{
+    ViewData["Title"] = "Detalhes da Tarefa";
+}
+
+<h2>Detalhes da Tarefa</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Título</dt>
+        <dd class="col-sm-9">@Model.Titulo</dd>
+
+        <dt class="col-sm-3">Descrição</dt>
+        <dd class="col-sm-9">@Model.Descricao</dd>
+
+        <dt class="col-sm-3">Prioridade</dt>
+        <dd class="col-sm-9">@Model.Prioridade</dd>
+
+        <dt class="col-sm-3">Prazo</dt>
+        <dd class="col-sm-9">@Model.Prazo.ToString("dd/MM/yyyy")</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
+</div>

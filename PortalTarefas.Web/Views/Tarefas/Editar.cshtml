@@ -1,0 +1,38 @@
+@model PortalTarefas.Web.ViewModels.TarefaInputModel
+
+@{
+    ViewData["Title"] = "Editar Tarefa";
+}
+
+<h2>Editar Tarefa</h2>
+
+<form asp-controller="Tarefas" asp-action="Editar" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ConcurrencyToken" />
+
+    <div class="mb-3">
+        <label asp-for="Titulo" class="form-label">Título</label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Descricao" class="form-label">Descrição</label>
+        <textarea asp-for="Descricao" class="form-control"></textarea>
+        <span asp-validation-for="Descricao" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Prioridade" class="form-label">Prioridade</label>
+        <select asp-for="Prioridade" class="form-select" asp-items="Html.GetEnumSelectList<PortalTarefas.Web.Models.Prioridade>()"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Prazo" class="form-label">Prazo</label>
+        <input asp-for="Prazo" class="form-control" type="date" />
+        <span asp-validation-for="Prazo" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

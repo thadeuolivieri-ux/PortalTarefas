@@ -38,16 +38,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19SZXN1bW9UYXJlZmFQYXJ0aWFsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFyZWZhcy9DcmVhdGUuY3NodG1s
+[/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Criar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFyZWZhcy9Dcmlhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFyZWZhcy9EZXRhaWxzLmNzaHRtbA==
+[/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Detalhes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFyZWZhcy9EZXRhbGhlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Edit.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFyZWZhcy9FZGl0LmNzaHRtbA==
+[/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Editar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVGFyZWZhcy9FZGl0YXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/workspaces/PortalTarefas/PortalTarefas.Web/Views/Tarefas/Index.cshtml]
