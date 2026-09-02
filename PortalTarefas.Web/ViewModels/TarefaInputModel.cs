@@ -9,24 +9,19 @@ namespace PortalTarefas.Web.ViewModels
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "O título é obrigatório.")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "O título deve ter entre 3 e 100 caracteres.")]
-        [Display(Name = "Título da Tarefa")]
+        [Required(ErrorMessage = "O título da tarefa é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O título não pode exceder 100 caracteres.")]
         public string Titulo { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A descrição é obrigatória.")]
-        [StringLength(500, ErrorMessage = "A descrição não pode ultrapassar 500 caracteres.")]
-        [Display(Name = "Descrição Detalhada")]
+        [StringLength(500, ErrorMessage = "A descrição não pode exceder 500 caracteres.")]
         public string Descricao { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A prioridade é obrigatória.")]
-        [Display(Name = "Prioridade")]
         public Prioridade Prioridade { get; set; }
 
-        [Required(ErrorMessage = "O prazo é obrigatório.")]
         [DataType(DataType.Date)]
-        [Display(Name = "Prazo de Conclusão")]
         [PrazoPorPrioridade]
         public DateTime Prazo { get; set; } = DateTime.Today.AddDays(1);
+
+        public string ConcurrencyToken { get; set; } = Guid.NewGuid().ToString();
     }
 }

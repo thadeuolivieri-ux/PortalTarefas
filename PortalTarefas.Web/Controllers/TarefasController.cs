@@ -1,49 +1,36 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PortalTarefas.Web.Filters;
+using Microsoft.EntityFrameworkCore;
 using PortalTarefas.Web.Models;
 using PortalTarefas.Web.Services;
 using PortalTarefas.Web.ViewModels;
 
 namespace PortalTarefas.Web.Controllers
 {
-    [ServiceFilter(typeof(LogAuditoriaActionFilter))]
     public class TarefasController : Controller
     {
-        private readonly ITarefaService _tarefaService;
+        private readonly TarefaEfService _service;
 
-        public TarefasController(ITarefaService tarefaService)
+        public TarefasController(TarefaEfService service)
         {
-            _tarefaService = tarefaService;
+            _service = service;
         }
 
-        // GET: Tarefas
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var tarefas = _tarefaService.ObterTodas();
+            var tarefas = await _service.ObterTodasAsync();
             return View(tarefas);
         }
 
-        // GET: Tarefas/Details/1
-        public IActionResult Details(int id)
-        {
-            var tarefa = _tarefaService.ObterPorId(id);
-            if (tarefa == null)
-            {
-                return NotFound();
-            }
-            return View(tarefa);
-        }
-
-        // GET: Tarefas/Create
-        public IActionResult Create()
+        public IActionResult Criar()
         {
             return View(new TarefaInputModel());
         }
 
-        // POST: Tarefas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(TarefaInputModel model)
+        public async Task<IActionResult> Criar(TarefaInputModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -55,17 +42,17 @@ namespace PortalTarefas.Web.Controllers
                 Titulo = model.Titulo,
                 Descricao = model.Descricao,
                 Prioridade = model.Prioridade,
-                Prazo = model.Prazo
+                Prazo = model.Prazo,
+                ConcurrencyToken = Guid.NewGuid().ToString()
             };
 
-            _tarefaService.Adicionar(tarefa);
+            await _service.AdicionarAsync(tarefa);
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Tarefas/Edit/1
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Editar(int id)
         {
-            var tarefa = _tarefaService.ObterPorId(id);
+            var tarefa = await _service.ObterPorIdAsync(id);
             if (tarefa == null)
             {
                 return NotFound();
@@ -77,22 +64,17 @@ namespace PortalTarefas.Web.Controllers
                 Titulo = tarefa.Titulo,
                 Descricao = tarefa.Descricao,
                 Prioridade = tarefa.Prioridade,
-                Prazo = tarefa.Prazo
+                Prazo = tarefa.Prazo,
+                ConcurrencyToken = tarefa.ConcurrencyToken
             };
 
             return View(model);
         }
 
-        // POST: Tarefas/Edit/1
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, TarefaInputModel model)
+        public async Task<IActionResult> Editar(TarefaInputModel model)
         {
-            if (id != model.Id)
-            {
-                return BadRequest();
-            }
-
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -104,15 +86,20 @@ namespace PortalTarefas.Web.Controllers
                 Titulo = model.Titulo,
                 Descricao = model.Descricao,
                 Prioridade = model.Prioridade,
-                Prazo = model.Prazo
+                Prazo = model.Prazo,
+                ConcurrencyToken = model.ConcurrencyToken
             };
 
-            if (!_tarefaService.Atualizar(tarefa))
+            try
             {
-                return NotFound();
+                await _service.AtualizarComTransacaoEConcorrenciaAsync(tarefa);
+                return RedirectToAction(nameof(Index));
             }
-
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateConcurrencyException)
+            {
+                ModelState.AddModelError(string.Empty, "O registro foi alterado por outro usuário. Por favor, recarregue a página e tente novamente.");
+                return View(model);
+            }
         }
     }
 }

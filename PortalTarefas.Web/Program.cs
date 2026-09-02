@@ -2,6 +2,8 @@ using PortalTarefas.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 using PortalTarefas.Web.Services;
 using PortalTarefas.Web.Middlewares;
+using Microsoft.EntityFrameworkCore;
+using PortalTarefas.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +21,26 @@ builder.Services.AddCors(options =>
     });
 });
 
-// 2. Serviços NOVOS da Atividade 2 (MVC + Serviço em Memória + Filtro)
+// 2. Serviços da Atividade 2 e 3
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<ITarefaService, TarefaMemoryService>();
 builder.Services.AddScoped<LogAuditoriaActionFilter>(); // Registration for Action Filter
 
+// Configuração do banco SQLite e Serviços da Atividade 3
+builder.Services.AddDbContext<PortalTarefasDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<TarefaEfService>();
+builder.Services.AddScoped<TarefaDapperService>(); // Passo 4: Registro do serviço Dapper
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<PortalTarefasDbContext>();
+    DbInitializer.Initialize(context);
+}
 
 // Middlewares e Tratamento de Erros da Atividade 1
 app.UseExceptionHandler(errorApp =>
@@ -97,7 +113,7 @@ app.MapPost("/api/tarefas", ([FromBody] TarefaCreateDto novaTarefa) =>
 });
 
 // ==========================================
-// ROTAS NOVAS DA ATIVIDADE 2 (MVC + Razor)
+// ROTAS NOVAS DA ATIVIDADE 2 E 3 (MVC + Razor)
 // ==========================================
 app.MapControllers(); // Controllers normais de API
 
