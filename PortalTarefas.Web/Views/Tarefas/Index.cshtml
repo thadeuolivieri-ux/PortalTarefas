@@ -1,0 +1,27 @@
+@model IEnumerable<PortalTarefas.Web.Models.Tarefa>
+@{
+    ViewData["Title"] = "Listagem de Tarefas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>@ViewData["Title"]</h2>
+    <a asp-action="Create" class="btn btn-success">+ Nova Tarefa</a>
+</div>
+
+<div class="row">
+    @if (!Model.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-info">Nenhuma tarefa cadastrada até o momento.</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-md-6">
+                <partial name="_ResumoTarefaPartial" model="item" />
+            </div>
+        }
+    }
+</div>

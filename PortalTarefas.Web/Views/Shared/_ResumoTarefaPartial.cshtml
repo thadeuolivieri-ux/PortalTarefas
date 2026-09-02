@@ -1,0 +1,18 @@
+@model PortalTarefas.Web.Models.Tarefa
+
+<div class="card mb-3 shadow-sm border-0 bg-light">
+    <div class="card-body">
+        <h5 class="card-title text-primary">@Model.Titulo</h5>
+        <p class="card-text text-muted">@Model.Descricao</p>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-@(Model.Prioridade == Prioridade.Alta ? "danger" : Model.Prioridade == Prioridade.Media ? "warning" : "info")">
+                Prioridade: @Model.Prioridade
+            </span>
+            <small class="text-muted">Prazo: @Model.Prazo.ToString("dd/MM/yyyy")</small>
+        </div>
+        <div>
+            <a asp-controller="Tarefas" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-info">Detalhes</a>
+            <a asp-controller="Tarefas" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-warning">Editar</a>
+        </div>
+    </div>
+</div>

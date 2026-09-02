@@ -1,0 +1,112 @@
+using PortalTarefas.Web.Filters;
+using Microsoft.AspNetCore.Mvc;
+using PortalTarefas.Web.Services;
+using PortalTarefas.Web.Middlewares;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 1. Serviços da Atividade 1
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendLocal", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// 2. Serviços NOVOS da Atividade 2 (MVC + Serviço em Memória + Filtro)
+builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<ITarefaService, TarefaMemoryService>();
+builder.Services.AddScoped<LogAuditoriaActionFilter>(); // Registration for Action Filter
+
+var app = builder.Build();
+
+// Middlewares e Tratamento de Erros da Atividade 1
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            Erro = "Ocorreu um erro interno no servidor.",
+            Status = 500
+        });
+    });
+});
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseCors("FrontendLocal");
+
+app.UseRequestLogging();
+
+app.UseRouting();
+
+// ==========================================
+// ENDPOINTS DA ATIVIDADE 1 (Isolados e Mantidos)
+// ==========================================
+
+List<TarefaDto> bancoTarefas = new()
+{
+    new TarefaDto(1, "Configurar Projeto", "Criar base em .NET 10", "Concluída"),
+    new TarefaDto(2, "Criar Endpoints", "Implementar Minimal APIs", "Pendente")
+};
+
+app.MapGet("/api/minimal/diagnostico", () => Results.Ok(new
+{
+    Origem = "Minimal API",
+    HorarioUtc = DateTime.UtcNow,
+    VersaoRuntime = Environment.Version.ToString(),
+    Status = "Saudável"
+}));
+
+app.MapGet("/api/tarefas", ([FromQuery] string? situacao, [FromHeader(Name = "X-Client-Id")] string? clientId) =>
+{
+    var resultado = string.IsNullOrEmpty(situacao) 
+        ? bancoTarefas 
+        : bancoTarefas.Where(t => t.Situacao.Equals(situacao, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    return Results.Ok(new { Client = clientId ?? "Anônimo", Dados = resultado });
+});
+
+app.MapGet("/api/tarefas/{id:int}", (int id) =>
+{
+    var tarefa = bancoTarefas.FirstOrDefault(t => t.Id == id);
+    return tarefa is not null ? Results.Ok(tarefa) : Results.NotFound(new { Mensagem = "Tarefa não encontrada." });
+});
+
+app.MapPost("/api/tarefas", ([FromBody] TarefaCreateDto novaTarefa) =>
+{
+    if (string.IsNullOrWhiteSpace(novaTarefa.Titulo))
+    {
+        return Results.BadRequest(new { Erro = "O título da tarefa é obrigatório." });
+    }
+
+    var id = bancoTarefas.Max(t => t.Id) + 1;
+    var tarefaCriada = new TarefaDto(id, novaTarefa.Titulo, novaTarefa.Descricao, "Pendente");
+    bancoTarefas.Add(tarefaCriada);
+
+    return Results.Created($"/api/tarefas/{id}", tarefaCriada);
+});
+
+// ==========================================
+// ROTAS NOVAS DA ATIVIDADE 2 (MVC + Razor)
+// ==========================================
+app.MapControllers(); // Controllers normais de API
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Tarefas}/{action=Index}/{id?}"); // Rota convencional das telas MVC
+
+app.Run();
+
+// Records da Atividade 1
+public record TarefaDto(int Id, string Titulo, string Descricao, string Situacao);
+public record TarefaCreateDto(string Titulo, string Descricao);
