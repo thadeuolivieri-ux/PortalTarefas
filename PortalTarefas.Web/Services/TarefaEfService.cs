@@ -38,11 +38,18 @@ namespace PortalTarefas.Web.Services
 
             try
             {
-                // Altera o token de concorrência para a nova versão
-                tarefa.ConcurrencyToken = Guid.NewGuid().ToString();
-                _context.Tarefas.Update(tarefa);
+                // 1. Captura o token original que veio do formulário
+                string tokenOriginal = tarefa.ConcurrencyToken;
 
-                // Registra o evento de auditoria
+                // 2. Anexa a entidade e define o token original no rastreador do EF
+                var entry = _context.Entry(tarefa);
+                entry.State = EntityState.Modified;
+                entry.Property(t => t.ConcurrencyToken).OriginalValue = tokenOriginal;
+
+                // 3. Define um novo token para a próxima alteração
+                tarefa.ConcurrencyToken = Guid.NewGuid().ToString();
+
+                // 4. Registra o evento de auditoria
                 var auditoria = new EventoAuditoria
                 {
                     Descricao = $"Tarefa ID {tarefa.Id} atualizada com sucesso.",
@@ -50,14 +57,14 @@ namespace PortalTarefas.Web.Services
                 };
                 _context.EventosAuditoria.Add(auditoria);
 
-                // Salva tudo na mesma transação
+                // 5. Salva tudo na mesma transação
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
                 await transaction.RollbackAsync();
-                throw; // Repassa para ser capturado no Controller
+                throw; // Repassa para o Controller tratar
             }
             catch
             {

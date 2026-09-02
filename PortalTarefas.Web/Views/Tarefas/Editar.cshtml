@@ -6,6 +6,8 @@
 
 <h2>Editar Tarefa</h2>
 
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
 <form asp-controller="Tarefas" asp-action="Editar" method="post">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="ConcurrencyToken" />
