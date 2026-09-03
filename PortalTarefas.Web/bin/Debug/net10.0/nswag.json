@@ -2,22 +2,13 @@
   "runtime": "Net100",
   "documentGenerator": {
     "fromDocument": {
-      "json": "wwwroot/openapi.json"
+      "url": "wwwroot/openapi.json"
     }
   },
   "codeGenerators": {
     "openApiToTypeScriptClient": {
       "className": "PortalTarefasApiClient",
-      "moduleName": "",
-      "namespace": "",
-      "typeScriptVersion": 4.3,
       "template": "Fetch",
-      "promiseType": "Promise",
-      "dateTimeType": "Date",
-      "nullValue": "Undefined",
-      "generateClientClasses": true,
-      "generateClientInterfaces": true,
-      "generateOptionalParameters": true,
       "outputFilePath": "ClientApp/portalTarefasApiClient.ts"
     }
   }

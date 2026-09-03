@@ -11,11 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// Configuração do CORS para permitir requisições no GitHub Codespaces
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendLocal", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -46,6 +47,7 @@ builder.Services.AddOpenApi(options =>
         document.Info.Title = "API de Gestão de Tarefas (PortalTarefas API)";
         document.Info.Version = "v1";
         document.Info.Description = "Contrato HTTP RESTful documentado para a Unidade 4 da disciplina de Desenvolvimento Web .NET.";
+        document.Servers.Clear();
         return Task.CompletedTask;
     });
 });

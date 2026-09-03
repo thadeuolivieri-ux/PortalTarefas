@@ -26,7 +26,7 @@ public class TarefasApiController : ControllerBase
     public async Task<IActionResult> GetPaged(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        [FromQuery] string? sortBy = "datacriacao",
+        [FromQuery] string? sortBy = "id",
         [FromQuery] string? direction = "asc",
         [FromQuery] string? search = null,
         [FromQuery] bool? isCompleted = null)
