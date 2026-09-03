@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PortalTarefas.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e72ceb62417969a1d369f9ba00884d846e03c1ac")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7a9d2cde90451e287e170ddb1451294097039c69")]
 [assembly: System.Reflection.AssemblyProductAttribute("PortalTarefas.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PortalTarefas.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -20,8 +20,9 @@ export function TarefasListPage() {
   const [data, setData] = useState<PagedResult<TarefaSummaryDto> | null>(null);
   const [state, setState] = useState<RequestState>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
-  // Busca de dados sincronizada com a URL
+  // Busca de dados sincronizada com a URL e o gatilho de atualização
   useEffect(() => {
     let isSubscribed = true; // Previne atualização de estado em componente desmontado
 
@@ -59,11 +60,29 @@ export function TarefasListPage() {
     return () => {
       isSubscribed = false; // Cancela efeito obsoleto ao desmontar ou reexecutar
     };
-  }, [page, search, sortBy]);
+  }, [page, search, sortBy, refreshKey]);
 
   // Atualização de filtros na URL
   const handleSearchChange = (value: string) => {
     setSearchParams({ search: value, page: '1', sortBy });
+  };
+
+  // Função para exclusão de tarefa
+  const handleDelete = async (id: number) => {
+    if (!confirm(`Tem certeza de que deseja excluir a tarefa #${id}?`)) {
+      return;
+    }
+
+    try {
+      await apiService.deleteTarefa(id);
+      setRefreshKey((prev) => prev + 1); // Dispara a recarga dos dados na tabela
+    } catch (err) {
+      if (err instanceof ApiError) {
+        alert(`Erro ao excluir: ${err.message}`);
+      } else {
+        alert('Falha ao excluir a tarefa.');
+      }
+    }
   };
 
   return (
@@ -72,7 +91,16 @@ export function TarefasListPage() {
 
       {/* Ações e Filtros */}
       <div style={{ marginBottom: '15px', display: 'flex', gap: '10px' }}>
-        <Link to="/tarefas/nova" style={{ padding: '8px 12px', background: '#28a745', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
+        <Link
+          to="/tarefas/nova"
+          style={{
+            padding: '8px 12px',
+            background: '#28a745',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '4px',
+          }}
+        >
           + Nova Tarefa
         </Link>
         <input
@@ -119,7 +147,22 @@ export function TarefasListPage() {
                   <td>{t.priority}</td>
                   <td>{t.isCompleted ? 'Concluída' : 'Pendente'}</td>
                   <td>
-                    <Link to={`/tarefas/${t.id}`}>Ver Detalhes</Link>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <Link to={`/tarefas/${t.id}`}>Ver Detalhes</Link>
+                      <button
+                        onClick={() => handleDelete(t.id)}
+                        style={{
+                          background: '#dc3545',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Excluir
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

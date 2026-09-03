@@ -30,6 +30,10 @@ export class ApiError extends Error {
  */
 async function handleResponse<T>(response: Response): Promise<T> {
   if (response.ok) {
+    // Trata respostas com corpo vazio (ex: HTTP 204 No Content no DELETE)
+    if (response.status === 204) {
+      return {} as T;
+    }
     return response.json() as Promise<T>;
   }
 
@@ -98,6 +102,24 @@ export const apiService = {
         body: JSON.stringify(data),
       });
       return await handleResponse<TarefaDetailDto>(response);
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      throw new ApiError(0, 'Falha de conexão com a rede ou servidor offline.');
+    }
+  },
+
+  /**
+   * Realiza a exclusão de uma tarefa por ID no backend.
+   */
+  async deleteTarefa(id: number): Promise<void> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/tarefas/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        await handleResponse<void>(response);
+      }
     } catch (error) {
       if (error instanceof ApiError) throw error;
       throw new ApiError(0, 'Falha de conexão com a rede ou servidor offline.');
