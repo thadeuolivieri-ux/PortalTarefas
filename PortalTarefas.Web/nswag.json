@@ -1,0 +1,15 @@
+{
+  "runtime": "Net100",
+  "documentGenerator": {
+    "fromDocument": {
+      "url": "wwwroot/openapi.json"
+    }
+  },
+  "codeGenerators": {
+    "openApiToTypeScriptClient": {
+      "className": "PortalTarefasApiClient",
+      "template": "Fetch",
+      "outputFilePath": "ClientApp/portalTarefasApiClient.ts"
+    }
+  }
+}

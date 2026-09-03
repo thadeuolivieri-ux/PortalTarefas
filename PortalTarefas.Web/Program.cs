@@ -24,14 +24,31 @@ builder.Services.AddCors(options =>
 // 2. Serviços da Atividade 2 e 3
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<ITarefaService, TarefaMemoryService>();
-builder.Services.AddScoped<LogAuditoriaActionFilter>(); // Registration for Action Filter
+builder.Services.AddScoped<LogAuditoriaActionFilter>();
 
 // Configuração do banco SQLite e Serviços da Atividade 3
 builder.Services.AddDbContext<PortalTarefasDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<TarefaEfService>();
-builder.Services.AddScoped<TarefaDapperService>(); // Passo 4: Registro do serviço Dapper
+builder.Services.AddScoped<TarefaDapperService>();
+
+// ==========================================
+// SERVIÇOS DA ATIVIDADE 4 (API REST, OpenAPI & Problem Details)
+// ==========================================
+builder.Services.AddScoped<ITarefaApiService, TarefaApiService>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info.Title = "API de Gestão de Tarefas (PortalTarefas API)";
+        document.Info.Version = "v1";
+        document.Info.Description = "Contrato HTTP RESTful documentado para a Unidade 4 da disciplina de Desenvolvimento Web .NET.";
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -42,7 +59,7 @@ using (var scope = app.Services.CreateScope())
     DbInitializer.Initialize(context);
 }
 
-// Middlewares e Tratamento de Erros da Atividade 1
+// Middlewares e Tratamento de Erros
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -64,6 +81,19 @@ app.UseCors("FrontendLocal");
 app.UseRequestLogging();
 
 app.UseRouting();
+
+// ==========================================
+// MIDDLEWARES DE AMBIENTE DA ATIVIDADE 4 (Swagger & OpenAPI)
+// ==========================================
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/openapi/v1.json", "PortalTarefas API v1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
 // ==========================================
 // ENDPOINTS DA ATIVIDADE 1 (Isolados e Mantidos)
@@ -113,13 +143,13 @@ app.MapPost("/api/tarefas", ([FromBody] TarefaCreateDto novaTarefa) =>
 });
 
 // ==========================================
-// ROTAS NOVAS DA ATIVIDADE 2 E 3 (MVC + Razor)
+// ROTAS NOVAS DA ATIVIDADE 2, 3 E 4 (MVC + API Controllers)
 // ==========================================
-app.MapControllers(); // Controllers normais de API
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Tarefas}/{action=Index}/{id?}"); // Rota convencional das telas MVC
+    pattern: "{controller=Tarefas}/{action=Index}/{id?}");
 
 app.Run();
 
