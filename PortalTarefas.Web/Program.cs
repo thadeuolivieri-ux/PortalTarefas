@@ -1,9 +1,10 @@
-using PortalTarefas.Web.Filters;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PortalTarefas.Web.Services;
-using PortalTarefas.Web.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using PortalTarefas.Web.Data;
+using PortalTarefas.Web.Filters;
+using PortalTarefas.Web.Middlewares;
+using PortalTarefas.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,53 @@ builder.Services.AddScoped<LogAuditoriaActionFilter>();
 // Configuração do banco SQLite e Serviços da Atividade 3
 builder.Services.AddDbContext<PortalTarefasDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ==========================================
+// SERVIÇOS DA ATIVIDADE 6 (ASP.NET Core Identity & Segurança)
+// ==========================================
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    // Requisitos de senha didáticos
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    
+    // Configurações de Bloqueio (Lockout)
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+})
+.AddEntityFrameworkStores<PortalTarefasDbContext>()
+.AddDefaultTokenProviders();
+
+// Ajuste nos Cookies para API REST (retorna 401/403 em vez de redirecionar para tela HTML)
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.ExpireTimeSpan = TimeSpan.FromHours(2);
+    
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+    
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
+});
+
+// Configuração de Autorização e Políticas da Atividade 6
+builder.Services.AddAuthorization(options =>
+{
+    // Política baseada no Claim 'Permissao' com valor 'EditarOutraEquipe'
+    options.AddPolicy("PodeEditarOutraEquipe", policy =>
+        policy.RequireClaim("Permissao", "EditarOutraEquipe"));
+});
 
 builder.Services.AddScoped<TarefaEfService>();
 builder.Services.AddScoped<TarefaDapperService>();
@@ -58,7 +106,10 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<PortalTarefasDbContext>();
+    var config = services.GetRequiredService<IConfiguration>();
+    
     DbInitializer.Initialize(context);
+    await DbInitializer.SeedSecurityAsync(services, config);
 }
 
 // Middlewares e Tratamento de Erros
@@ -83,6 +134,10 @@ app.UseCors("FrontendLocal");
 app.UseRequestLogging();
 
 app.UseRouting();
+
+// Middlewares da Atividade 6 (Autenticação e Autorização na ordem correta)
+app.UseAuthentication();
+app.UseAuthorization();
 
 // ==========================================
 // MIDDLEWARES DE AMBIENTE DA ATIVIDADE 4 (Swagger & OpenAPI)

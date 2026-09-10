@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PortalTarefas.Web.Models;
 
 namespace PortalTarefas.Web.Data
 {
-    public class PortalTarefasDbContext : DbContext
+    public class PortalTarefasDbContext : IdentityDbContext<IdentityUser>
     {
         public PortalTarefasDbContext(DbContextOptions<PortalTarefasDbContext> options)
             : base(options)

@@ -9,6 +9,7 @@
       "PortalTarefas.Web/1.0.0": {
         "dependencies": {
           "Dapper": "2.1.79",
+          "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.12",
           "Microsoft.AspNetCore.OpenApi": "10.0.11",
           "Microsoft.EntityFrameworkCore.Design": "10.0.11",
           "Microsoft.EntityFrameworkCore.Sqlite": "10.0.11",
@@ -31,6 +32,17 @@
           "lib/net6.0/Humanizer.dll": {
             "assemblyVersion": "2.14.0.0",
             "fileVersion": "2.14.1.48190"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.12": {
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.12"
+        },
+        "runtime": {
+          "lib/net10.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll": {
+            "assemblyVersion": "10.0.12.0",
+            "fileVersion": "10.0.1226.42308"
           }
         }
       },
@@ -336,22 +348,22 @@
           }
         }
       },
-      "Microsoft.EntityFrameworkCore/10.0.11": {
+      "Microsoft.EntityFrameworkCore/10.0.12": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.11"
+          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.12"
         },
         "runtime": {
           "lib/net10.0/Microsoft.EntityFrameworkCore.dll": {
-            "assemblyVersion": "10.0.11.0",
-            "fileVersion": "10.0.1126.37416"
+            "assemblyVersion": "10.0.12.0",
+            "fileVersion": "10.0.1226.42308"
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Abstractions/10.0.11": {
+      "Microsoft.EntityFrameworkCore.Abstractions/10.0.12": {
         "runtime": {
           "lib/net10.0/Microsoft.EntityFrameworkCore.Abstractions.dll": {
-            "assemblyVersion": "10.0.11.0",
-            "fileVersion": "10.0.1126.37416"
+            "assemblyVersion": "10.0.12.0",
+            "fileVersion": "10.0.1226.42308"
           }
         }
       },
@@ -362,7 +374,7 @@
           "Microsoft.CodeAnalysis.CSharp": "5.0.0",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "5.0.0",
           "Microsoft.CodeAnalysis.Workspaces.MSBuild": "5.0.0",
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.11",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.12",
           "Microsoft.Extensions.DependencyModel": "10.0.11",
           "Mono.TextTemplating": "3.0.0",
           "Newtonsoft.Json": "13.0.4"
@@ -374,14 +386,14 @@
           }
         }
       },
-      "Microsoft.EntityFrameworkCore.Relational/10.0.11": {
+      "Microsoft.EntityFrameworkCore.Relational/10.0.12": {
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "10.0.11"
+          "Microsoft.EntityFrameworkCore": "10.0.12"
         },
         "runtime": {
           "lib/net10.0/Microsoft.EntityFrameworkCore.Relational.dll": {
-            "assemblyVersion": "10.0.11.0",
-            "fileVersion": "10.0.1126.37416"
+            "assemblyVersion": "10.0.12.0",
+            "fileVersion": "10.0.1226.42308"
           }
         }
       },
@@ -396,7 +408,7 @@
       "Microsoft.EntityFrameworkCore.Sqlite.Core/10.0.11": {
         "dependencies": {
           "Microsoft.Data.Sqlite.Core": "10.0.11",
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.11",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.12",
           "Microsoft.Extensions.DependencyModel": "10.0.11",
           "SQLitePCLRaw.core": "2.1.12"
         },
@@ -693,6 +705,13 @@
       "path": "humanizer.core/2.14.1",
       "hashPath": "humanizer.core.2.14.1.nupkg.sha512"
     },
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore/10.0.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7W/9vKC65y41W6JXwC6WSU++D43wY/ANhrm7tJdbm2lrbzNkYClja6uL3Cg69y+PJ1Q4nARb3eWs9PNMWCdYxQ==",
+      "path": "microsoft.aspnetcore.identity.entityframeworkcore/10.0.12",
+      "hashPath": "microsoft.aspnetcore.identity.entityframeworkcore.10.0.12.nupkg.sha512"
+    },
     "Microsoft.AspNetCore.OpenApi/10.0.11": {
       "type": "package",
       "serviceable": true,
@@ -749,19 +768,19 @@
       "path": "microsoft.data.sqlite.core/10.0.11",
       "hashPath": "microsoft.data.sqlite.core.10.0.11.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore/10.0.11": {
+    "Microsoft.EntityFrameworkCore/10.0.12": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-VOSGU8en6HZJs8t7UMFN+9vGcRgVOOn6fA44Ngcg2NyvJ3P1KE94iAb0XzaVaGhXGtt+qaM/VtEn0/hzluQJeg==",
-      "path": "microsoft.entityframeworkcore/10.0.11",
-      "hashPath": "microsoft.entityframeworkcore.10.0.11.nupkg.sha512"
+      "sha512": "sha512-e7OrVN8U5yr4kuwdTHWBHGVQIVsGfMkAr0Ej1/BnrS989Q0XBVANpIzNZ2bc1GvMZ0/XwMt5InTnmKskxGy99Q==",
+      "path": "microsoft.entityframeworkcore/10.0.12",
+      "hashPath": "microsoft.entityframeworkcore.10.0.12.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Abstractions/10.0.11": {
+    "Microsoft.EntityFrameworkCore.Abstractions/10.0.12": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6auJR+9+9VunznKfH7WGrHMrnrmA0F7JZ22EXzwXvVhjfnbu9Xq7NSIWaOf3KJsOanM2qf5ajJ2JR5TlcPZTLA==",
-      "path": "microsoft.entityframeworkcore.abstractions/10.0.11",
-      "hashPath": "microsoft.entityframeworkcore.abstractions.10.0.11.nupkg.sha512"
+      "sha512": "sha512-kDrux7T6C3V/YYYe2LXr7x6AEsVyq5Y2YoTE9er1SwbDtap3z1g8RgxNh5eKQVyB4T+DKvBBJ4Ezd/VZzJQJZg==",
+      "path": "microsoft.entityframeworkcore.abstractions/10.0.12",
+      "hashPath": "microsoft.entityframeworkcore.abstractions.10.0.12.nupkg.sha512"
     },
     "Microsoft.EntityFrameworkCore.Design/10.0.11": {
       "type": "package",
@@ -770,12 +789,12 @@
       "path": "microsoft.entityframeworkcore.design/10.0.11",
       "hashPath": "microsoft.entityframeworkcore.design.10.0.11.nupkg.sha512"
     },
-    "Microsoft.EntityFrameworkCore.Relational/10.0.11": {
+    "Microsoft.EntityFrameworkCore.Relational/10.0.12": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-grznnTJgEYxaWpdKAsTzg6j+89jHgCXWYp+QGtlX5O92+w/VuhWM6JLPYb+uw8M9VhGUvOTsO76dYOy9vNPd5Q==",
-      "path": "microsoft.entityframeworkcore.relational/10.0.11",
-      "hashPath": "microsoft.entityframeworkcore.relational.10.0.11.nupkg.sha512"
+      "sha512": "sha512-OiHmr8XzX96dbgMsYGe8qoqg4KxibdZG2r0QUVJBGktFInOp8IrABe8jvcbo5hrqeWfbwpK7fCEBiEPbY/ik4A==",
+      "path": "microsoft.entityframeworkcore.relational/10.0.12",
+      "hashPath": "microsoft.entityframeworkcore.relational.10.0.12.nupkg.sha512"
     },
     "Microsoft.EntityFrameworkCore.Sqlite/10.0.11": {
       "type": "package",
