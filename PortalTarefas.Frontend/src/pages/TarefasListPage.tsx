@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { apiService, ApiError } from '../services/api';
 import type { TarefaSummaryDto, PagedResult } from '../types/tarefa';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * Tipagem para representação explícita dos 5 estados de requisição.
@@ -9,6 +10,7 @@ import type { TarefaSummaryDto, PagedResult } from '../types/tarefa';
 type RequestState = 'idle' | 'loading' | 'success' | 'empty' | 'error';
 
 export function TarefasListPage() {
+  const { usuario, logout, temRole } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Leitura dos filtros a partir da URL
@@ -24,7 +26,7 @@ export function TarefasListPage() {
 
   // Busca de dados sincronizada com a URL e o gatilho de atualização
   useEffect(() => {
-    let isSubscribed = true; // Previne atualização de estado em componente desmontado
+    let isSubscribed = true;
 
     const fetchTarefas = async () => {
       setState('loading');
@@ -58,7 +60,7 @@ export function TarefasListPage() {
     fetchTarefas();
 
     return () => {
-      isSubscribed = false; // Cancela efeito obsoleto ao desmontar ou reexecutar
+      isSubscribed = false;
     };
   }, [page, search, sortBy, refreshKey]);
 
@@ -75,7 +77,7 @@ export function TarefasListPage() {
 
     try {
       await apiService.deleteTarefa(id);
-      setRefreshKey((prev) => prev + 1); // Dispara a recarga dos dados na tabela
+      setRefreshKey((prev) => prev + 1);
     } catch (err) {
       if (err instanceof ApiError) {
         alert(`Erro ao excluir: ${err.message}`);
@@ -87,6 +89,38 @@ export function TarefasListPage() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      {/* Barra Superior de Identificação e Sessão */}
+      <div style={{
+  display: 'flex',
+  justifyContent: 'space-between', // <--- Corrigido de 'justify' para 'justifyContent'
+  alignItems: 'center',
+  background: '#f8f9fa',
+  padding: '10px 15px',
+  borderRadius: '6px',
+  marginBottom: '20px',
+  border: '1px solid #e9ecef'
+}}>
+        <div>
+          <strong>Sessão Ativa:</strong> {usuario?.email} 
+          <span style={{ marginLeft: '10px', fontSize: '0.9em', color: '#6c757d' }}>
+            ({usuario?.roles?.join(', ') || 'Sem Role'})
+          </span>
+        </div>
+        <button
+          onClick={logout}
+          style={{
+            background: '#6c757d',
+            color: '#fff',
+            border: 'none',
+            padding: '6px 12px',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Sair (Logout)
+        </button>
+      </div>
+
       <h2>Listagem de Tarefas (SPA React)</h2>
 
       {/* Ações e Filtros */}
@@ -149,19 +183,23 @@ export function TarefasListPage() {
                   <td>
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                       <Link to={`/tarefas/${t.id}`}>Ver Detalhes</Link>
-                      <button
-                        onClick={() => handleDelete(t.id)}
-                        style={{
-                          background: '#dc3545',
-                          color: '#fff',
-                          border: 'none',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        Excluir
-                      </button>
+
+                      {/* Exibe o botão Excluir apenas para a Role Administrador */}
+                      {temRole('Administrador') && (
+                        <button
+                          onClick={() => handleDelete(t.id)}
+                          style={{
+                            background: '#dc3545',
+                            color: '#fff',
+                            border: 'none',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Excluir
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
