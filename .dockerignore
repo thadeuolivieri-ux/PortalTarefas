@@ -1,0 +1,11 @@
+**/.git
+**/.vscode
+**/.idea
+**/bin
+**/obj
+**/node_modules
+**/wwwroot/dist
+**/*.db
+**/*.db-journal
+**/*.log
+appsettings.Development.json

@@ -1,0 +1,57 @@
+name: CI/CD Pipeline - PortalTarefas
+
+on:
+  push:
+    branches: [ "main", "atividade8" ]
+  pull_request:
+    branches: [ "main", "atividade8" ]
+
+jobs:
+  build-and-test:
+    name: Build, Test e Containerização
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      # 1. Configuração do SDK .NET
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore de Dependências (.NET)
+        run: dotnet restore PortalTarefas.Web/PortalTarefas.Web.csproj
+
+      - name: Build da API (.NET)
+        run: dotnet build PortalTarefas.Web/PortalTarefas.Web.csproj --configuration Release --no-restore
+
+      - name: Execução dos Testes (.NET)
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      # 2. Configuração do Node.js (Front-end)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore, Test e Build do Front-end (React)
+        run: |
+          if [ -d "PortalTarefas.Frontend" ]; then
+            cd PortalTarefas.Frontend
+            npm ci
+            npm run build --if-present
+          fi
+
+      # 3. Build e Validação da Imagem Docker
+      - name: Build da Imagem Docker (Tag vinculada ao Commit SHA)
+        run: docker build -t portaltarefas:${{ github.sha }} .
+
+      - name: Validação do Contêiner em Execução (Smoke Test)
+        run: |
+          docker run -d --name app-test -p 8080:8080 -e ConnectionStrings__DefaultConnection="Data Source=PortalTarefas.db" portaltarefas:${{ github.sha }}
+          sleep 5
+          docker ps
+          curl -f http://localhost:8080/health/live || exit 1
+          docker stop app-test && docker rm app-test

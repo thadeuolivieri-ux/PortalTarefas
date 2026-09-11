@@ -1,8 +1,9 @@
-using PortalTarefas.Web.DTOs;
-using PortalTarefas.Web.Services;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PortalTarefas.Web.DTOs;
+using PortalTarefas.Web.Services;
 
 namespace PortalTarefas.Web.Controllers;
 
@@ -12,11 +13,14 @@ namespace PortalTarefas.Web.Controllers;
 [Authorize] // Exige autenticação por padrão para todas as rotas (Retorna 401 para anônimos)
 public class TarefasApiController : ControllerBase
 {
+    private static readonly ActivitySource ActivitySource = new("PortalTarefas.API");
     private readonly ITarefaApiService _service;
+    private readonly TarefasMetrics _metrics;
 
-    public TarefasApiController(ITarefaApiService service)
+    public TarefasApiController(ITarefaApiService service, TarefasMetrics metrics)
     {
         _service = service;
+        _metrics = metrics;
     }
 
     /// <summary>
@@ -71,10 +75,10 @@ public class TarefasApiController : ControllerBase
     }
 
     /// <summary>
-    /// Cria uma nova tarefa.
+    /// Cria uma nova tarefa com rastreamento de métrica e span customizado.
     /// </summary>
     [HttpPost]
-    [Authorize(Roles = "Usuario,Administrador")] // Permite criação para qualquer usuário autenticado
+    [Authorize(Roles = "Usuario,Administrador")]
     [ProducesResponseType(typeof(TaskDetailDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -85,7 +89,16 @@ public class TarefasApiController : ControllerBase
             return ValidationProblem(ModelState);
         }
 
+        // Trace Customizado (Etapa 2)
+        using var activity = ActivitySource.StartActivity("CriarTarefaOp");
+        activity?.SetTag("tarefa.titulo", dto.Title);
+        activity?.SetTag("tarefa.prioridade", dto.Priority.ToString());
+
         var created = await _service.CreateAsync(dto);
+
+        // Métrica de Negócio (Etapa 2)
+        _metrics.RegistrarTarefaCriada(dto.Priority.ToString());
+
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
@@ -94,7 +107,7 @@ public class TarefasApiController : ControllerBase
     /// Exige a claim 'Permissao: EditarOutraEquipe' via política.
     /// </summary>
     [HttpPut("{id:int}")]
-    [Authorize(Policy = "PodeEditarOutraEquipe")] // Exige a política baseada em Claim
+    [Authorize(Policy = "PodeEditarOutraEquipe")]
     [ProducesResponseType(typeof(TaskDetailDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -140,7 +153,7 @@ public class TarefasApiController : ControllerBase
     /// Restrito exclusivamente a usuários com a Role 'Administrador'.
     /// </summary>
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Administrador")] // Exige a Role Administrador (Retorna 403 para 'Usuario')
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

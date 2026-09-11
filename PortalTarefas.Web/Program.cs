@@ -5,6 +5,9 @@ using PortalTarefas.Web.Data;
 using PortalTarefas.Web.Filters;
 using PortalTarefas.Web.Middlewares;
 using PortalTarefas.Web.Services;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +102,46 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
+// ==========================================
+// SERVIÇOS DA ATIVIDADE 7 (OpenTelemetry - Metrics & Tracing)
+// ==========================================
+builder.Services.AddSingleton<TarefasMetrics>();
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService("PortalTarefas.API"))
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter();
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddMeter(TarefasMetrics.MeterName)
+            .AddConsoleExporter();
+    });
+
+// ==========================================
+// SERVIÇOS DA ATIVIDADE 7 (Health Checks)
+// ==========================================
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<PortalTarefasDbContext>(
+        name: "banco_sqlite",
+        tags: new[] { "ready" });
+        
+// ==========================================
+// VALIDAÇÃO DE CONFIGURAÇÃO OBRIGATÓRIA (Unidade 8 - Fail-Fast)
+// ==========================================
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("A string de conexão 'DefaultConnection' é obrigatória e não foi configurada.");
+}
+
 
 var app = builder.Build();
 
@@ -126,6 +169,11 @@ app.UseExceptionHandler(errorApp =>
         });
     });
 });
+
+// ==========================================
+// MIDDLEWARES DA ATIVIDADE 7 (Observabilidade)
+// ==========================================
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
