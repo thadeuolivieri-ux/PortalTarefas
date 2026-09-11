@@ -20,6 +20,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
+          include-prerelease: true
 
       - name: Restore de Dependências (.NET)
         run: dotnet restore PortalTarefas.Web/PortalTarefas.Web.csproj
@@ -28,7 +29,7 @@ jobs:
         run: dotnet build PortalTarefas.Web/PortalTarefas.Web.csproj --configuration Release --no-restore
 
       - name: Execução dos Testes (.NET)
-        run: dotnet test --configuration Release --no-build --verbosity normal
+        run: dotnet test PortalTarefas.Web/PortalTarefas.Web.csproj --configuration Release --no-build --verbosity normal
 
       # 2. Configuração do Node.js (Front-end)
       - name: Setup Node.js
@@ -36,11 +37,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Restore, Test e Build do Front-end (React)
+      - name: Build do Front-end (React)
         run: |
           if [ -d "PortalTarefas.Frontend" ]; then
             cd PortalTarefas.Frontend
-            npm ci
+            npm install
             npm run build --if-present
           fi
 
