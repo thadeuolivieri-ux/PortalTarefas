@@ -47,8 +47,9 @@ jobs:
 
       - name: Validação do Contêiner em Execução (Smoke Test)
         run: |
-          docker run -d --name app-test -p 8080:8080 -e ConnectionStrings__DefaultConnection="Data Source=PortalTarefas.db" portaltarefas:${{ github.sha }}
-          sleep 5
+          docker run -d --name app-test -p 8080:8080 -e ConnectionStrings__DefaultConnection="Data Source=/tmp/PortalTarefas.db" portaltarefas:${{ github.sha }}
+          sleep 8
           docker ps
+          docker logs app-test
           curl -f http://localhost:8080/health/live || exit 1
           docker stop app-test && docker rm app-test
