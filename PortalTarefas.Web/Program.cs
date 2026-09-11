@@ -256,6 +256,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Tarefas}/{action=Index}/{id?}");
 
+app.MapGet("/health/live", () => Results.Ok("Healthy"));
 app.Run();
 
 // Records da Atividade 1
